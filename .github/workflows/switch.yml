@@ -1,6 +1,5 @@
 name: Switch Validation
 on:
-  pull_request:
   workflow_dispatch:
 
 jobs:
