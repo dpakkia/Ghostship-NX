@@ -1,5 +1,6 @@
 name: Windows Validation
-on: [pull_request]
+on:
+  workflow_dispatch:
 
 jobs:
   build:
