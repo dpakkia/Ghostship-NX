@@ -1,0 +1,48 @@
+name: Bump libultraship submodule
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch or commit in dpakkia/libultraship-NX (e.g. develop or a SHA)"
+        required: true
+        default: "develop"
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to push with GITHUB_TOKEN
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync and init submodule
+        run: |
+          git submodule sync --recursive
+          git submodule update --init --recursive libultraship
+
+      - name: Bump libultraship submodule pointer
+        run: |
+          cd libultraship
+          git remote -v
+          git fetch origin "${{ inputs.ref }}" --depth=1
+          git checkout --detach FETCH_HEAD
+          cd ..
+
+          # record the new gitlink in the parent repo
+          git add .gitmodules libultraship
+
+          # commit only if something changed
+          git diff --cached --quiet && { echo "No submodule change."; exit 0; }
+
+          git commit -m "Bump libultraship submodule to ${{ inputs.ref }}"
+          git push
