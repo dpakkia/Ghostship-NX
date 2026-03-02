@@ -15,6 +15,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           sudo apt-get install -y ninja-build
           sudo apt-get remove -y cmake
           git -C libultraship remote add nx https://github.com/YoshiCrystal9/libultraship.git
